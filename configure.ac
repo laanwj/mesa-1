@@ -319,6 +319,9 @@ if test "x$GCC" = xyes; then
     # We don't want floating-point math functions to set errno or trap
     CFLAGS="$CFLAGS -fno-math-errno -fno-trapping-math"
 
+    # MF: for backtrace
+    CFLAGS="$CFLAGS -funwind-tables"
+
     # Flags to help ensure that certain portions of the code -- and only those
     # portions -- can be built with MSVC:
     # - src/util, src/gallium/auxiliary, rc/gallium/drivers/llvmpipe, and
@@ -357,6 +360,9 @@ if test "x$GXX" = xyes; then
 
     # We don't want floating-point math functions to set errno or trap
     CXXFLAGS="$CXXFLAGS -fno-math-errno -fno-trapping-math"
+
+    # MF: for backtrace
+    CXXFLAGS="$CXXFLAGS -funwind-tables"
 fi
 
 AC_SUBST([MSVC2013_COMPAT_CFLAGS])
