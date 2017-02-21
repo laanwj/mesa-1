@@ -285,6 +285,9 @@ if test "x$GCC" = xyes; then
     # http://gcc.gnu.org/bugzilla/show_bug.cgi?id=43052
     CFLAGS="$CFLAGS -fno-builtin-memcmp"
 
+    # MF: for backtrace
+    CFLAGS="$CFLAGS -funwind-tables"
+
     # Flags to help ensure that certain portions of the code -- and only those
     # portions -- can be built with MSVC:
     # - src/util, src/gallium/auxiliary, and src/gallium/drivers/llvmpipe needs
@@ -327,6 +330,9 @@ if test "x$GXX" = xyes; then
 
     # Work around aliasing bugs - developers should comment this out
     CXXFLAGS="$CXXFLAGS -fno-strict-aliasing"
+
+    # MF: for backtrace
+    CXXFLAGS="$CXXFLAGS -funwind-tables"
 
     # gcc's builtin memcmp is slower than glibc's
     # http://gcc.gnu.org/bugzilla/show_bug.cgi?id=43052
