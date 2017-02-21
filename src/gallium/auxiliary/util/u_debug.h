@@ -84,7 +84,8 @@ debug_printf(const char *format, ...) _util_printf_format(1,2);
 static INLINE void
 debug_printf(const char *format, ...)
 {
-#ifdef DEBUG
+//#ifdef DEBUG
+#if 1
    va_list ap;
    va_start(ap, format);
    _debug_vprintf(format, ap);
