@@ -278,6 +278,15 @@ PUBLIC const __DRIextension **__driDriverGetExtensions_kgsl(void)
    globalDriverAPI = &galliumdrm_driver_api;
    return galliumdrm_driver_extensions;
 }
+
+const __DRIextension **__driDriverGetExtensions_imxdrm(void);
+
+PUBLIC const __DRIextension **__driDriverGetExtensions_imxdrm(void)
+{
+   globalDriverAPI = &galliumdrm_driver_api;
+   return galliumdrm_driver_extensions;
+}
+
 #endif
 
 static struct pipe_screen *
@@ -375,8 +384,10 @@ dd_create_screen(int fd)
    else
 #endif
 #if defined(GALLIUM_FREEDRENO)
-   if ((strcmp(driver_name, "kgsl") == 0) || (strcmp(driver_name, "msm") == 0))
+   if ((strcmp(driver_name, "kgsl") == 0) || (strcmp(driver_name, "msm") == 0)
+         || (strcmp(driver_name, "imxdrm") == 0)) {
       return pipe_freedreno_create_screen(fd);
+   }
    else
 #endif
 #if defined(GALLIUM_VC4)
@@ -464,7 +475,8 @@ dd_configuration(enum drm_conf conf)
    else
 #endif
 #if defined(GALLIUM_FREEDRENO)
-   if ((strcmp(driver_name, "kgsl") == 0) || (strcmp(driver_name, "msm") == 0))
+   if ((strcmp(driver_name, "kgsl") == 0) || (strcmp(driver_name, "msm") == 0)
+         || (strcmp(driver_name, "imxdrm") == 0))
       return configuration_query(conf);
    else
 #endif
