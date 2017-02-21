@@ -167,6 +167,12 @@ fd_context_destroy(struct pipe_context *pctx)
 	if (ctx->primconvert)
 		util_primconvert_destroy(ctx->primconvert);
 
+	/* unbind framebuffer */
+	for (i = 0; i < PIPE_MAX_COLOR_BUFS; i++) {
+		pipe_surface_reference(&ctx->framebuffer.cbufs[i], NULL);
+	}
+	pipe_surface_reference(&ctx->framebuffer.zsbuf, NULL);
+
 	util_slab_destroy(&ctx->transfer_pool);
 
 	fd_ringmarker_del(ctx->draw_start);
