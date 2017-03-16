@@ -108,7 +108,7 @@ fd2_draw_vbo(struct fd_context *ctx, const struct pipe_draw_info *info,
 		OUT_RING(ring, info->max_index);        /* VGT_MAX_VTX_INDX */
 		OUT_RING(ring, info->min_index);        /* VGT_MIN_VTX_INDX */
 	} else {
-		fd20x_pre_draw(ctx, ring);
+		fd20x_pre_draw(ctx, ring, info->indexed);
         }
 
 	fd_draw_emit(ctx->batch, ring, ctx->primtypes[info->mode],
@@ -291,7 +291,8 @@ fd2_clear(struct fd_context *ctx, unsigned buffers,
 		OUT_RING(ring, 3);                 /* VGT_MAX_VTX_INDX */
 		OUT_RING(ring, 0);                 /* VGT_MIN_VTX_INDX */
 	} else {
-		fd20x_pre_draw(ctx, ring);
+		OUT_WFI (ring);
+		fd20x_pre_draw(ctx, ring, false);
         }
 
 	fd_draw(ctx->batch, ring, DI_PT_RECTLIST, IGNORE_VISIBILITY,
