@@ -40,6 +40,7 @@
 #include "fd2_emit.h"
 #include "fd2_program.h"
 #include "fd2_util.h"
+#include "fd20x_util.h"
 #include "fd2_zsa.h"
 
 static uint32_t fmt2swap(enum pipe_format format)
@@ -83,14 +84,16 @@ emit_gmem2mem_surf(struct fd_context *ctx, uint32_t base,
 			A2XX_RB_COPY_DEST_INFO_WRITE_BLUE |
 			A2XX_RB_COPY_DEST_INFO_WRITE_ALPHA);
 
-	OUT_WFI (ring);
 
 	if (!is_a20x(ctx->screen)) {
+		OUT_WFI (ring);
 		OUT_PKT3(ring, CP_SET_CONSTANT, 3);
 		OUT_RING(ring, CP_REG(REG_A2XX_VGT_MAX_VTX_INDX));
 		OUT_RING(ring, 3);                 /* VGT_MAX_VTX_INDX */
 		OUT_RING(ring, 0);                 /* VGT_MIN_VTX_INDX */
-	}
+	} else {
+		fd20x_pre_draw(ctx, ring);
+        }
 
 	fd_draw(ctx, ring, DI_PT_RECTLIST, IGNORE_VISIBILITY,
 			DI_SRC_SEL_AUTO_INDEX, 3, 0, INDEX_SIZE_IGN, 0, 0, NULL);
@@ -214,7 +217,9 @@ emit_mem2gmem_surf(struct fd_context *ctx, uint32_t base,
 		OUT_RING(ring, CP_REG(REG_A2XX_VGT_MAX_VTX_INDX));
 		OUT_RING(ring, 3);                 /* VGT_MAX_VTX_INDX */
 		OUT_RING(ring, 0);                 /* VGT_MIN_VTX_INDX */
-	}
+	} else {
+		fd20x_pre_draw(ctx, ring);
+        }
 
 	fd_draw(ctx, ring, DI_PT_RECTLIST, IGNORE_VISIBILITY,
 			DI_SRC_SEL_AUTO_INDEX, 3, 0, INDEX_SIZE_IGN, 0, 0, NULL);
