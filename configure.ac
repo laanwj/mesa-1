@@ -1180,51 +1180,6 @@ xyesyes)
     GL_PC_LIB_PRIV="$GL_PC_LIB_PRIV $SELINUX_LIBS -lm $PTHREAD_LIBS"
     ;;
 xyesno)
-    # DRI-based GLX
-    PKG_CHECK_MODULES([GLPROTO], [glproto >= $GLPROTO_REQUIRED])
-
-    # find the DRI deps for libGL
-    dri_modules="x11 xext xdamage xfixes x11-xcb xcb xcb-glx >= $XCBGLX_REQUIRED"
-
-    if test x"$driglx_direct" = xyes; then
-        if test x"$dri_platform" = xdrm ; then
-            DEFINES="$DEFINES -DGLX_USE_DRM"
-            if test "x$have_libdrm" != xyes; then
-               AC_MSG_ERROR([Direct rendering requires libdrm >= $LIBDRM_REQUIRED])
-            fi
-
-            PKG_CHECK_MODULES([DRI2PROTO], [dri2proto >= $DRI2PROTO_REQUIRED])
-            GL_PC_REQ_PRIV="$GL_PC_REQ_PRIV libdrm >= $LIBDRM_REQUIRED"
-            if test x"$enable_dri3" = xyes; then
-               PKG_CHECK_MODULES([DRI3PROTO], [dri3proto >= $DRI3PROTO_REQUIRED])
-               PKG_CHECK_MODULES([PRESENTPROTO], [presentproto >= $PRESENTPROTO_REQUIRED])
-            fi
-
-            if test x"$enable_dri" = xyes; then
-               dri_modules="$dri_modules xcb-dri2 >= $XCBDRI2_REQUIRED"
-            fi
-
-            if test x"$enable_dri3" = xyes; then
-               PKG_CHECK_EXISTS([xcb >= $XCB_REQUIRED], [], AC_MSG_ERROR([DRI3 requires xcb >= $XCB_REQUIRED]))
-               dri_modules="$dri_modules xcb-dri3 xcb-present xcb-sync xshmfence >= $XSHMFENCE_REQUIRED"
-            fi
-        fi
-        if test x"$dri_platform" = xapple ; then
-            DEFINES="$DEFINES -DGLX_USE_APPLEGL"
-        fi
-    fi
-
-    # add xf86vidmode if available
-    PKG_CHECK_MODULES([XF86VIDMODE], [xxf86vm], HAVE_XF86VIDMODE=yes, HAVE_XF86VIDMODE=no)
-    if test "$HAVE_XF86VIDMODE" = yes ; then
-        dri_modules="$dri_modules xxf86vm"
-    fi
-
-    PKG_CHECK_MODULES([DRIGL], [$dri_modules])
-    GL_PC_REQ_PRIV="$GL_PC_REQ_PRIV $dri_modules"
-    X11_INCLUDES="$X11_INCLUDES $DRIGL_CFLAGS"
-    GL_LIB_DEPS="$DRIGL_LIBS"
-
     # need DRM libs, $PTHREAD_LIBS, etc.
     GL_LIB_DEPS="$GL_LIB_DEPS $LIBDRM_LIBS -lm $PTHREAD_LIBS $DLOPEN_LIBS"
     GL_PC_LIB_PRIV="-lm $PTHREAD_LIBS $DLOPEN_LIBS"
