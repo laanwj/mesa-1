@@ -358,6 +358,7 @@ setup_slices(struct fd_resource *rsc, uint32_t alignment)
 	uint32_t width = prsc->width0;
 	uint32_t height = prsc->height0;
 	uint32_t depth = prsc->depth0;
+        uint32_t blockwidth = util_format_get_blockwidth(prsc->format);
 	/* in layer_first layout, the level (slice) contains just one
 	 * layer (since in fact the layer contains the slices)
 	 */
@@ -366,7 +367,7 @@ setup_slices(struct fd_resource *rsc, uint32_t alignment)
 	for (level = 0; level <= prsc->last_level; level++) {
 		struct fd_resource_slice *slice = fd_resource_slice(rsc, level);
 
-		slice->pitch = width = align(width, 32);
+		slice->pitch = width = align(width, 32) / blockwidth;
 		slice->offset = size;
 		/* 1d array and 2d array textures must all have the same layer size
 		 * for each miplevel on a3xx. 3d textures can have different layer
