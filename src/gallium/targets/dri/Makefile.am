@@ -48,6 +48,7 @@ gallium_dri_la_LIBADD = \
 	$(top_builddir)/src/gallium/drivers/noop/libnoop.la \
 	$(top_builddir)/src/gallium/drivers/rbug/librbug.la \
 	$(top_builddir)/src/gallium/drivers/trace/libtrace.la \
+        $(top_builddir)/src/mapi/shared-glapi/libglapi.la \
 	$(SELINUX_LIBS) \
 	$(EXPAT_LIBS) \
 	$(LIBDRM_LIBS) \
