@@ -55,6 +55,14 @@ static uint32_t fmt2swap(enum pipe_format format)
 	}
 }
 
+static uint32_t
+fd2_compute_depth_base(uint32_t bin_w, uint32_t bin_h)
+{
+	/* Depth base in gmem must be aligned to 1024 */
+	return align(bin_w * bin_h, 0x400);
+}
+
+
 /* transfer from gmem to system memory (ie. normal RAM) */
 
 static void
@@ -168,7 +176,7 @@ fd2_emit_tile_gmem2mem(struct fd_context *ctx, struct fd_tile *tile)
 			A2XX_RB_COPY_DEST_OFFSET_Y(tile->yoff));
 
 	if (ctx->resolve & (FD_BUFFER_DEPTH | FD_BUFFER_STENCIL))
-		emit_gmem2mem_surf(ctx, tile->bin_w * tile->bin_h, pfb->zsbuf);
+		emit_gmem2mem_surf(ctx, fd2_compute_depth_base(tile->bin_w, tile->bin_h), pfb->zsbuf);
 
 	if (ctx->resolve & FD_BUFFER_COLOR)
 		emit_gmem2mem_surf(ctx, 0, pfb->cbufs[0]);
@@ -332,7 +340,7 @@ fd2_emit_tile_mem2gmem(struct fd_context *ctx, struct fd_tile *tile)
 	OUT_RING(ring, 0x00000000);
 
 	if (fd_gmem_needs_restore(ctx, tile, FD_BUFFER_DEPTH | FD_BUFFER_STENCIL))
-		emit_mem2gmem_surf(ctx, bin_w * bin_h, pfb->zsbuf);
+		emit_mem2gmem_surf(ctx, fd2_compute_depth_base(bin_w, bin_h), pfb->zsbuf);
 
 	if (fd_gmem_needs_restore(ctx, tile, FD_BUFFER_COLOR))
 		emit_mem2gmem_surf(ctx, 0, pfb->cbufs[0]);
@@ -355,7 +363,7 @@ fd2_emit_tile_init(struct fd_context *ctx)
 	OUT_RING(ring, gmem->bin_w);                 /* RB_SURFACE_INFO */
 	OUT_RING(ring, A2XX_RB_COLOR_INFO_SWAP(fmt2swap(format)) |
 			A2XX_RB_COLOR_INFO_FORMAT(fd2_pipe2color(format)));
-	reg = A2XX_RB_DEPTH_INFO_DEPTH_BASE(align(gmem->bin_w * gmem->bin_h, 4));
+	reg = A2XX_RB_DEPTH_INFO_DEPTH_BASE(fd2_compute_depth_base(gmem->bin_w, gmem->bin_h));
 	if (pfb->zsbuf)
 		reg |= A2XX_RB_DEPTH_INFO_DEPTH_FORMAT(fd_pipe2depth(pfb->zsbuf->format));
 	OUT_RING(ring, reg);                         /* RB_DEPTH_INFO */
