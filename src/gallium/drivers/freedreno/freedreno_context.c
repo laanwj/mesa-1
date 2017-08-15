@@ -132,12 +132,6 @@ fd_context_destroy(struct pipe_context *pctx)
 	if (ctx->clear_rs_state)
 		pctx->delete_rasterizer_state(pctx, ctx->clear_rs_state);
 
-	/* unbind framebuffer */
-	for (i = 0; i < PIPE_MAX_COLOR_BUFS; i++) {
-		pipe_surface_reference(&ctx->framebuffer.cbufs[i], NULL);
-	}
-	pipe_surface_reference(&ctx->framebuffer.zsbuf, NULL);
-
 	if (ctx->primconvert)
 		util_primconvert_destroy(ctx->primconvert);
 
