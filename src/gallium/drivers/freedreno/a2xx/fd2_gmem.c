@@ -98,15 +98,15 @@ emit_gmem2mem_surf(struct fd_batch *batch, uint32_t base,
 			A2XX_RB_COPY_DEST_INFO_WRITE_ALPHA);
 
 
-	if (!is_a20x(ctx->screen)) {
+	if (!is_a20x(batch->ctx->screen)) {
 		OUT_WFI (ring);
 		OUT_PKT3(ring, CP_SET_CONSTANT, 3);
 		OUT_RING(ring, CP_REG(REG_A2XX_VGT_MAX_VTX_INDX));
 		OUT_RING(ring, 3);                 /* VGT_MAX_VTX_INDX */
 		OUT_RING(ring, 0);                 /* VGT_MIN_VTX_INDX */
 	} else {
-		fd20x_pre_draw(ctx, ring, false);
-        }
+		fd20x_pre_draw(batch, false);
+	}
 
 	fd_draw(batch, ring, DI_PT_RECTLIST, IGNORE_VISIBILITY,
 			DI_SRC_SEL_AUTO_INDEX, 3, 0, INDEX_SIZE_IGN, 0, 0, NULL);
@@ -228,14 +228,14 @@ emit_mem2gmem_surf(struct fd_batch *batch, uint32_t base,
 	OUT_RING(ring, 0x00000000);
 	OUT_RING(ring, 0x00000200);
 
-	if (!is_a20x(ctx->screen)) {
+	if (!is_a20x(batch->ctx->screen)) {
 		OUT_PKT3(ring, CP_SET_CONSTANT, 3);
 		OUT_RING(ring, CP_REG(REG_A2XX_VGT_MAX_VTX_INDX));
 		OUT_RING(ring, 3);                 /* VGT_MAX_VTX_INDX */
 		OUT_RING(ring, 0);                 /* VGT_MIN_VTX_INDX */
 	} else {
-		fd20x_pre_draw(ctx, ring, false);
-        }
+		fd20x_pre_draw(batch, false);
+	}
 
 	fd_draw(batch, ring, DI_PT_RECTLIST, IGNORE_VISIBILITY,
 			DI_SRC_SEL_AUTO_INDEX, 3, 0, INDEX_SIZE_IGN, 0, 0, NULL);

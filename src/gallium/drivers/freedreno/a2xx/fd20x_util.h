@@ -34,10 +34,11 @@
 #include "fd2_context.h"
 
 static inline void
-fd20x_pre_draw(struct fd_context *ctx, struct fd_ringbuffer *ring, bool indexed)
+fd20x_pre_draw(struct fd_batch *batch, bool indexed)
 {
-	struct fd2_context *fd2_ctx = fd2_context(ctx);
-        if (indexed) {
+	struct fd_ringbuffer *ring = batch->gmem;
+	struct fd2_context *fd2_ctx = fd2_context(batch->ctx);
+	if (indexed) {
 		/* WL: wait for current DMA to finish?
 		 * This is necessary for indexed rendering, I'm not sure it is necessary
 		 * for non-indexed */
@@ -59,7 +60,7 @@ fd20x_pre_draw(struct fd_context *ctx, struct fd_ringbuffer *ring, bool indexed)
 		OUT_RING(ring, 0x00000003);
 		OUT_RELOC(ring, fd_resource(fd2_ctx->solid_vertexbuf)->bo, 0x80, 0, 0);
 		OUT_RING(ring, 0x00000006);
-        }
+	}
 }
 
 #endif
