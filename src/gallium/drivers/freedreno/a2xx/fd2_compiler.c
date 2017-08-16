@@ -1156,10 +1156,10 @@ translate_instruction(struct fd2_compile_context *ctx,
 		break;
 	case TGSI_OPCODE_IF:
 		push_predicate(ctx, &inst->Src[0].Register);
-		ctx->so->ir->pred = IR2_PRED_EQ;
+		ctx->so->ir->pred = IR2_PRED_NE;
 		break;
 	case TGSI_OPCODE_ELSE:
-		ctx->so->ir->pred = IR2_PRED_NE;
+		ctx->so->ir->pred = IR2_PRED_EQ;
 		/* not sure if this is required in all cases, but blob compiler
 		 * won't combine EQ and NE in same CF:
 		 */
