@@ -34,9 +34,8 @@
 #include "fd2_context.h"
 
 static inline void
-fd20x_pre_draw(struct fd_batch *batch, bool indexed)
+fd20x_pre_draw(struct fd_batch *batch, struct fd_ringbuffer *ring, bool indexed)
 {
-	struct fd_ringbuffer *ring = batch->gmem;
 	struct fd2_context *fd2_ctx = fd2_context(batch->ctx);
 	if (indexed) {
 		/* WL: wait for current DMA to finish?
