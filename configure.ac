@@ -2768,6 +2768,9 @@ dnl We need to validate some needed dependencies for renderonly drivers.
 if test "x$HAVE_GALLIUM_ETNAVIV" != xyes -a "x$HAVE_GALLIUM_IMX" = xyes  ; then
     AC_MSG_ERROR([Building with imx requires etnaviv])
 fi
+if test "x$HAVE_GALLIUM_FREEDRENO" != xyes -a "x$HAVE_GALLIUM_IMX" = xyes  ; then
+    AC_MSG_ERROR([Building with imx requires freedreno])
+fi
 
 if test "x$HAVE_GALLIUM_VC4" != xyes -a "x$HAVE_GALLIUM_PL111" = xyes  ; then
     AC_MSG_ERROR([Building with pl111 requires vc4])

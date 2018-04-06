@@ -646,6 +646,8 @@ fd_resource_destroy(struct pipe_screen *pscreen,
 	fd_bc_invalidate_resource(rsc, true);
 	if (rsc->bo)
 		fd_bo_del(rsc->bo);
+	if (rsc->scanout)
+		renderonly_scanout_destroy(rsc->scanout, fd_screen(prsc->screen)->ro);
 	util_range_destroy(&rsc->valid_buffer_range);
 	FREE(rsc);
 }
@@ -658,6 +660,10 @@ fd_resource_get_handle(struct pipe_screen *pscreen,
 		unsigned usage)
 {
 	struct fd_resource *rsc = fd_resource(prsc);
+
+	/* Return handle from render-only if there is one attached */
+	if (handle->type == DRM_API_HANDLE_TYPE_KMS && renderonly_get_handle(rsc->scanout, handle))
+		return true;
 
 	return fd_screen_bo_get_handle(pscreen, rsc->bo,
 			rsc->slices[0].pitch * rsc->cpp, handle);
@@ -802,10 +808,39 @@ fd_resource_create(struct pipe_screen *pscreen,
 		const struct pipe_resource *tmpl)
 {
 	struct fd_screen *screen = fd_screen(pscreen);
-	struct fd_resource *rsc = CALLOC_STRUCT(fd_resource);
-	struct pipe_resource *prsc = &rsc->base;
+	struct fd_resource *rsc;
+	struct pipe_resource *prsc;
 	enum pipe_format format = tmpl->format;
 	uint32_t size;
+
+	if (tmpl->bind & PIPE_BIND_SCANOUT) {
+		struct pipe_resource scanout_tmpl = *tmpl;
+		struct renderonly_scanout *scanout;
+		struct winsys_handle handle;
+
+		assert(screen->ro);
+		assert(screen->ro->create_for_resource);
+		scanout = renderonly_scanout_for_resource(&scanout_tmpl,
+												screen->ro, &handle);
+		if (!scanout)
+			return NULL;
+
+		assert(handle.type == DRM_API_HANDLE_TYPE_FD);
+		rsc = fd_resource(pscreen->resource_from_handle(pscreen, tmpl,
+														&handle,
+														PIPE_HANDLE_USAGE_WRITE));
+		close(handle.handle);
+		if (!rsc)
+			return NULL;
+
+		rsc->scanout = scanout;
+
+		return &rsc->base;
+	}
+
+	/* TODO move this to fd_alloc_resource? */
+	rsc = CALLOC_STRUCT(fd_resource);
+	prsc = &rsc->base;
 
 	DBG("%p: target=%d, format=%s, %ux%ux%u, array_size=%u, last_level=%u, "
 			"nr_samples=%u, usage=%u, bind=%x, flags=%x", prsc,

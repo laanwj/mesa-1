@@ -36,6 +36,7 @@
 #include "pipe/p_screen.h"
 #include "util/u_memory.h"
 #include "util/slab.h"
+#include "renderonly/renderonly.h"
 #include "os/os_thread.h"
 
 #include "freedreno_batch_cache.h"
@@ -45,6 +46,7 @@ struct fd_bo;
 
 struct fd_screen {
 	struct pipe_screen base;
+	struct renderonly *ro;
 
 	mtx_t lock;
 
@@ -105,7 +107,7 @@ boolean fd_screen_bo_get_handle(struct pipe_screen *pscreen,
 struct fd_bo * fd_screen_bo_from_handle(struct pipe_screen *pscreen,
 		struct winsys_handle *whandle);
 
-struct pipe_screen * fd_screen_create(struct fd_device *dev);
+struct pipe_screen * fd_screen_create(struct fd_device *dev, struct renderonly *ro);
 
 static inline boolean
 is_a20x(struct fd_screen *screen)

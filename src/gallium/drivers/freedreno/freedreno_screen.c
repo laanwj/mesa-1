@@ -760,7 +760,7 @@ fd_screen_bo_from_handle(struct pipe_screen *pscreen,
 }
 
 struct pipe_screen *
-fd_screen_create(struct fd_device *dev)
+fd_screen_create(struct fd_device *dev, struct renderonly *ro)
 {
 	struct fd_screen *screen = CALLOC_STRUCT(fd_screen);
 	struct pipe_screen *pscreen;
@@ -779,6 +779,8 @@ fd_screen_create(struct fd_device *dev)
 	pscreen = &screen->base;
 
 	screen->dev = dev;
+	if (ro)
+		screen->ro = renderonly_dup(ro);
 	screen->refcnt = 1;
 
 	// maybe this should be in context?
